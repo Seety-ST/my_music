@@ -1,10 +1,10 @@
 <template>
 	<div class="top-tab-item">
 		<ul class="list">
-			<li><span class="txt">推荐</span></li>
-			<li><span class="txt">歌手</span></li>
-			<li><span class="txt">排行</span></li>
-			<li><span class="txt">搜索</span></li>
+			<router-link tag="li" to="/recommend"><span class="txt">推荐</span></router-link>
+			<router-link tag="li" to="/singer"><span class="txt">歌手</span></router-link>
+			<router-link tag="li" to="/rank"><span class="txt">排行</span></router-link>
+			<router-link tag="li" to="/search"><span class="txt">搜索</span></router-link>
 		</ul>
 	</div>
 </template>
@@ -27,7 +27,12 @@ export default {
 		display: -webkit-box;
 		li{
 			-webkit-box-flex: 1;
-			color: #222;
+			color: #fff;
+			text-align: center;
+			font-size: 14px;
+			&.router-link-active{
+				color: #ffcd32;
+			}
 		}
 	}
 }
