@@ -30,8 +30,11 @@ export default {
 			color: #fff;
 			text-align: center;
 			font-size: 14px;
+			padding: 14px 0px;
+			border-bottom: 2px solid #222;
 			&.router-link-active{
 				color: #ffcd32;
+				border-bottom-color: #ffcd32;
 			}
 		}
 	}
