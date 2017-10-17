@@ -20,6 +20,10 @@ export default {
 		data: {
 			type: Array,
 			default: null
+		},
+		listenScroll: {
+			type: Boolean,
+			default: false
 		}
 	},
 	mounted () {
@@ -44,6 +48,11 @@ export default {
 				probeType: self.probeType,
 				click: self.click
 			})
+			if (self.listenScroll) {
+				self.scroll.on('scroll', (pos) => {
+					self.$emit('scroll', pos)
+				})
+			}
 		},
 		enable () {
 			var self = this
@@ -56,6 +65,14 @@ export default {
 		refresh () {
 			var self = this
 			self.scroll && self.scroll.refresh()
+		},
+		scrollTo () {
+			var self = this
+			self.scroll && self.scroll.scrollTo.apply(self.scroll, arguments)
+		},
+		scrollToElement () {
+			var self = this
+			self.scroll && self.scroll.scrollToElement.apply(self.scroll, arguments)
 		}
 	},
 	watch: {

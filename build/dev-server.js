@@ -40,6 +40,23 @@ apiRouters.get('/getDiscList', function(req, res){
   })
 })
 
+apiRouters.get('/getSingerList', function(req, res){
+  var url = 'https://c.y.qq.com/v8/fcg-bin/v8.fcg'
+  axios.get(url, {
+    headers: {
+      referer: 'https://c.y.qq.com/',
+      host: 'c.y.qq.com'
+    },
+    params: req.query
+  }).then((response) => {
+    res.json(response.data)
+  }).catch((e) => {
+    console.log(e)
+  })
+})
+
+
+
 app.use('/api', apiRouters)
 
 var devMiddleware = require('webpack-dev-middleware')(compiler, {
