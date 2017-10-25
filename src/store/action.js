@@ -1,7 +1,8 @@
-export default class Singer {
-	constructor ({id, name}) {
-		this.id = id
-		this.name = name
-		this.avator = `https://y.gtimg.cn/music/photo_new/T001R150x150M000${id}.jpg?max_age=2592000`
-	}
+import * as types from './mutation-type'
+export const selectPlay = function ({commit, state}, {list, index}) {
+	commit(types.SET_PLAYLIST, list)
+	commit(types.SET_SEQUENCELIST, list)
+	commit(types.SET_FULLSCREEN, true)
+	commit(types.SET_CURRENTINDEX, index)
+	commit(types.SET_PLAYING, true)
 }
