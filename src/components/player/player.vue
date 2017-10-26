@@ -22,31 +22,24 @@
 						<span class="dot"></span>
 					</div>
 					<div class="progress-wrapper">
-						<span class="time time-l">1:20</span>
+						<span class="time time-l">{{formapTime(currentTime)}}</span>
 						<div class="progress-bar-wrapper">
-							<div class="progress-bar">
-								<div class="bar-inner">
-									<div class="progress"></div>
-									<div class="progress-btn-wrapper">
-										<div class="progress-btn"></div>
-									</div>	
-								</div>	
-							</div>
+							<progress-bar :percent="percent" @changeProgress="changeProgress"></progress-bar>
 						</div>	
-						<span class="time time-r">1:20</span>
+						<span class="time time-r">{{formapTime(curretsong.duration)}}</span>
 					</div>
 					<div class="operators">
 						<div class="icon i-left">
 							<i class="icon-sequence"></i>
 						</div>
-						<div class="icon i-left">
+						<div class="icon i-left" @click="prev">
 							<i class="icon-prev"></i>
 						</div>
 						<div class="icon i-center" @click="toggle_palying" >
 							<i :class="playIcon"></i>
 						</div>
-						<div class="icon i-right">
-							<i class="icon-next"></i>
+						<div class="icon i-right" @click="next">
+							<i class="icon-next" ></i>
 						</div>
 						<div class="icon i-right">
 							<i class="icon icon-not-favorite"></i>
@@ -76,21 +69,24 @@
 			</div>
 		</div>
   	</transition>
-  	<audio ref="audio" :src="curretsong.url"></audio>
+  	<audio ref="audio" :src="curretsong.url" @canplay="ready" @error="error" @timeupdate="updateTime"></audio>
   </div>
 </template>
 
 <script>
 import {mapGetters, mapMutations} from 'vuex'
+import progress from 'base/progress/progress'
 export default {
 	name: 'player',
 	data () {
 		return {
-			singer: []
+			singer: [],
+			songReady: false,
+			currentTime: ''
 		}
 	},
 	created () {
-		console.log(this.playlist)
+		console.log(this.currentTime)
 	},
 	computed: {
 		playIcon () {
@@ -102,11 +98,15 @@ export default {
 		rotate () {
 			return this.playing ? 'play' : 'play pause'
 		},
+		percent () {
+			return (this.currentTime / this.curretsong.duration)
+		},
 		...mapGetters([
 			'fullScreen',
 			'playlist',
 			'curretsong',
-			'playing'
+			'playing',
+			'currentIndex'
 		])
 	},
 	methods: {
@@ -122,12 +122,78 @@ export default {
 			let self = this
 			self.setPlaying(!self.playing)
 		},
+		prev () {
+			let self = this
+			if (!self.songReady) {
+				return
+			}
+			let index = self.currentIndex - 1
+			if (index < -1) {
+				index = self.playlist.length - 1
+			}
+			self.setCurrentIndex(index)
+			if (!self.playing) {
+				self.toggle_palying()
+			}
+			self.songReady = false
+		},
+		next () {
+			let self = this
+			if (!self.songReady) {
+				return
+			}
+			let index = self.currentIndex + 1
+			if (index > self.playlist.length) {
+				index = 0
+			}
+			self.setCurrentIndex(index)
+			if (!self.playing) {
+				self.toggle_palying()
+			}
+			self.songReady = false
+		},
+		ready () {
+			let self = this
+			self.songReady = true
+		},
+		error () {
+			let self = this
+			self.songReady = true
+		},
+		updateTime (e) {
+			let self = this
+			self.currentTime = e.target.currentTime
+		},
+		changeProgress (progress) {
+			let self = this
+			self.$refs.audio.currentTime = self.curretsong.duration * progress
+			if (!self.playing) {
+				self.toggle_palying()
+			}
+		},
+		formapTime (interval) {
+			interval = interval | 0
+			let min = (interval / 60) | 0 // | 0 的作用是向下取整 和Math.float(interval/60)效果一样
+			let second = this._pad((interval % 60))// 获取秒
+			return `${min}:${second}`
+		},
+		_pad (num) {
+			let n = 2 // 表示几位数处理
+			let len = num.toString().length
+			while (len < n) {
+				num = '0' + num
+				len++
+			}
+			return num
+		},
 		...mapMutations({
 			setFullScreen: 'SET_FULLSCREEN',
-			setPlaying: 'SET_PLAYING'
+			setPlaying: 'SET_PLAYING',
+			setCurrentIndex: 'SET_CURRENTINDEX'
 		})
 	},
 	components: {
+		'progress-bar': progress
 	},
 	watch: {
 		curretsong () {
@@ -288,39 +354,7 @@ export default {
 					-webkit-box-flex: 1;
 					-ms-flex: 1;
 					flex: 1;
-					.progress-bar{
-						height: 30px;
-						.bar-inner{
-							position: relative;
-							top: 13px;
-							height: 4px;
-							background: rgba(0,0,0,0.3);
-							.progress{
-								position: absolute;
-								height: 100%;
-								background: #ffcd32;
-								
-							}
-							.progress-btn-wrapper{
-								position: absolute;
-								left: -8px;
-								top: -13px;
-								width: 30px;
-								height: 30px;
-								.progress-btn{
-									position: relative;
-									top: 7px;
-									left: 7px;
-									box-sizing: border-box;
-									width: 16px;
-									height: 16px;
-									border: 3px solid #fff;
-									border-radius: 50%;
-									background: #ffcd32;
-								}
-							}
-						}
-					}
+					
 				}
 			}
 			.operators{
