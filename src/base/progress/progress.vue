@@ -54,9 +54,11 @@ export default {
 			self._toggleProgress()
 		},
 		clickProgress (e) {
-			console.log(e.offsetX)
 			let self = this
-			self._offsetWidth(e.offsetX)
+			// self._offsetWidth(e.offsetX)// offsetX获取有问题
+			// 以下是最新的解决方法
+			let offsetX = e.pageX - self.$refs.progressBar.getBoundingClientRect().left
+			self._offsetWidth(offsetX)
 			self._toggleProgress()
 		},
 		_toggleProgress () {

@@ -29,8 +29,8 @@
 						<span class="time time-r">{{formapTime(curretsong.duration)}}</span>
 					</div>
 					<div class="operators">
-						<div class="icon i-left">
-							<i class="icon-sequence"></i>
+						<div class="icon i-left" @click="changeMode">
+							<i :class="mode"></i>
 						</div>
 						<div class="icon i-left" @click="prev">
 							<i class="icon-prev"></i>
@@ -58,10 +58,10 @@
 				<h2 class="name">{{curretsong.album}}</h2>
 				<p class="desc">{{curretsong.singer}}</p>
 			</div>
-			<div class="control">
-				<div class="progress-circle" @click.stop.prevent="toggle_palying">
-					<i class="icon-mini" :class="miniIcon"></i>
-				</div>
+			<div class="control" @click.stop.prevent="toggle_palying">
+					<progress-circle :circle="circle" :percent="percent">
+						<i class="icon-mini" :class="miniIcon"></i>
+					</progress-circle>	
 				
 			</div>
 			<div class="control" >
@@ -69,20 +69,24 @@
 			</div>
 		</div>
   	</transition>
-  	<audio ref="audio" :src="curretsong.url" @canplay="ready" @error="error" @timeupdate="updateTime"></audio>
+  	<audio ref="audio" :src="curretsong.url" @ended="end" @canplay="ready" @error="error" @timeupdate="updateTime"></audio>
   </div>
 </template>
 
 <script>
 import {mapGetters, mapMutations} from 'vuex'
 import progress from 'base/progress/progress'
+import progressCircle from 'base/progress-circle/progress-circle'
+import {playmode} from 'common/js/config'
+import {shuffle} from 'common/js/until'
 export default {
 	name: 'player',
 	data () {
 		return {
 			singer: [],
 			songReady: false,
-			currentTime: ''
+			currentTime: '',
+			circle: 32
 		}
 	},
 	created () {
@@ -101,12 +105,17 @@ export default {
 		percent () {
 			return (this.currentTime / this.curretsong.duration)
 		},
+		mode () {
+			return this.playmode === playmode.sequence ? 'icon-sequence' : this.playmode === playmode.loop ? 'icon-loop' : 'icon-random'
+		},
 		...mapGetters([
 			'fullScreen',
 			'playlist',
 			'curretsong',
 			'playing',
-			'currentIndex'
+			'currentIndex',
+			'playmode',
+			'sequencelist'
 		])
 	},
 	methods: {
@@ -136,6 +145,19 @@ export default {
 				self.toggle_palying()
 			}
 			self.songReady = false
+		},
+		end () {
+			let self = this
+			if (self.playmode === playmode.loop) {
+				self.loop()
+			} else {
+				self.next()
+			}
+		},
+		loop () {
+			let self = this
+			self.$refs.audio.currentTime = 0
+			self.$refs.audio.play()
 		},
 		next () {
 			let self = this
@@ -171,6 +193,26 @@ export default {
 				self.toggle_palying()
 			}
 		},
+		changeMode () {
+			let self = this
+			let mode = (this.playmode + 1) % 3
+			self.setplaymode(mode)
+			let list = null
+			if (this.playmode === playmode.random) {
+				list = shuffle(self.sequencelist)
+			} else {
+				list = self.sequencelist
+			}
+			self.setPlayList(list)
+			self.resetCurrentIndex(list)
+		},
+		resetCurrentIndex (list) {
+			let self = this
+			let index = list.findIndex((item) => {
+				return item.id === self.curretsong.id
+			})
+			self.setCurrentIndex(index)
+		},
 		formapTime (interval) {
 			interval = interval | 0
 			let min = (interval / 60) | 0 // | 0 的作用是向下取整 和Math.float(interval/60)效果一样
@@ -189,14 +231,20 @@ export default {
 		...mapMutations({
 			setFullScreen: 'SET_FULLSCREEN',
 			setPlaying: 'SET_PLAYING',
-			setCurrentIndex: 'SET_CURRENTINDEX'
+			setCurrentIndex: 'SET_CURRENTINDEX',
+			setplaymode: 'SET_PLAYMODE',
+			setPlayList: 'SET_PLAYLIST'
 		})
 	},
 	components: {
-		'progress-bar': progress
+		'progress-bar': progress,
+		progressCircle
 	},
 	watch: {
-		curretsong () {
+		curretsong (newsong, oldsong) {
+			if (newsong.id === oldsong.id) {
+				return
+			}
 			let self = this
 			self.$nextTick(() => {
 				self.$refs.audio.play()
@@ -473,7 +521,7 @@ export default {
 					font-size: 32px;
 					position: absolute;
 					left: 0;
-					top: -15px;
+					top: 0;
 					color: rgba(255,205,49,0.5);
 					&.icon-pause-mini{
 						

@@ -6,7 +6,7 @@
 		</div>
 		<div class="avator-img" :style="image" ref="bgimg">
 			<div class="play-wrapper" ref="playWrap">
-				<div class="play">
+				<div class="play" @click="randomplay">
 					<i class="icon-play"></i>
 					<span class="text">随机播放全部</span>
 				</div>
@@ -71,15 +71,23 @@ export default {
 			let self = this
 			self.$router.back()
 		},
+		randomplay () {
+			let self = this
+			console.log(self.songs)
+			self.randomPlay({
+				list: self.songs
+			})
+		},
 		selectItem (item, index) {
 			let self = this
 			self.selectPlay({
-				list: this.songs,
+				list: self.songs,
 				index
 			})
 		},
 		...mapActions([
-			'selectPlay'
+			'selectPlay',
+			'randomPlay'
 		])
 	},
 	watch: {
