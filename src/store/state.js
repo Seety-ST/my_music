@@ -6,6 +6,7 @@ const state = {
 	playlist: [],
 	sequencelist: [],
 	playmode: playmode.sequence,
-	currentIndex: ''
+	currentIndex: '',
+	disc: []
 }
 export default state
