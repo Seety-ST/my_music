@@ -2,12 +2,12 @@
 	<div class="song-list">
 		<ul class="list">
 			<li v-for="(item,index) in song" @click="select(item,index)">
-				<div class="rank">
+				<div class="rank" v-show="rank">
 					<span class="icon" :class="getRankCls(index)" v-text="getRankText(index)"></span>
 				</div>
 				<div class="content">
-					<h3 class="name" v-html="item.singer"></h3>
-					<p class="desc" v-html="item.name"></p>
+					<h3 class="name" v-html="item.name"></h3>
+					<p class="desc" v-html="item.singer"></p>
 				</div>
 			</li>
 		</ul>
@@ -22,13 +22,18 @@ export default {
 		song: {
 			type: Array,
 			default: []
-		}
+		},
+    rank: {
+      type: Boolean,
+      default: false
+    }
 	},
 	mounted () {
 	},
 	methods: {
 		select (item, index) {
 			let self = this
+      console.log(item)
 			self.$emit('select', item, index)
 		},
 		getRankCls (index) {

@@ -15,7 +15,7 @@
 		<div class="bg-layer" ref="bgLayer"></div>
 		<scroll @scroll="scroll" :data="songs" class="list" ref="list" :probe-type="probeType" :listen-scroll="listenScroll">
 			<div class="song-list-wrapper">
-				<song-list :song="songs" @select="selectItem"></song-list>
+				<song-list :song="songs" @select="selectItem" :rank="rank"></song-list>
 			</div>
 		</scroll>
 	</div>	
@@ -42,6 +42,10 @@ export default {
 		img: {
 			type: String,
 			default: ''
+		},
+		rank: {
+			type: Boolean,
+			default: false
 		}
 	},
 	data () {

@@ -4,7 +4,7 @@
 		  	<div class="normal-player" v-show="fullScreen">
 				<div class="top">
 					<div class="back" @click="back"><i  class="icon-back"></i></div>
-					<h1 class="title">{{curretsong.album}}</h1>
+					<h1 class="title">{{curretsong.name}}</h1>
 					<h2 class="subtitle">{{curretsong.singer}}</h2>
 				</div>
 				<div class="middle">
@@ -55,7 +55,7 @@
 				<img  width="40" height="40" class="play pause" :src="curretsong.image">
 			</div>
 			<div class="text">
-				<h2 class="name">{{curretsong.album}}</h2>
+				<h2 class="name">{{curretsong.name}}</h2>
 				<p class="desc">{{curretsong.singer}}</p>
 			</div>
 			<div class="control" @click.stop.prevent="toggle_palying">

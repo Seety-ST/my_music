@@ -1,6 +1,6 @@
 <template>
 	<transition name="fade">
-		<singer-list :title="title" :img="bgImage" :songs="song"></singer-list>	
+		<singer-list :title="title" :img="bgImage" :songs="song" :rank="rank"></singer-list>	
 	</transition>
 </template>
 
@@ -14,7 +14,8 @@ export default {
 	name: 'detail',
 	data () {
 		return {
-			song: []
+			song: [],
+			rank: true
 		}
 	},
 	created () {
